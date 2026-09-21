@@ -1,0 +1,333 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - ExamGuard{% endblock %}
+
+{% block content %}
+<style>
+    .dashboard-shell {
+        display: grid;
+        grid-template-columns: 220px minmax(0, 1fr);
+        gap: 20px;
+        width: 100%;
+        align-items: start;
+    }
+
+    .panel-card {
+        background: rgba(255,255,255,0.96);
+        border: 1px solid rgba(148,163,184,0.18);
+        border-radius: 20px;
+        box-shadow: 0 18px 38px rgba(15, 23, 42, 0.06);
+    }
+
+    .user-banner {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 18px;
+        padding: 22px 22px;
+        margin-bottom: 18px;
+    }
+
+    .user-banner .identity {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+    }
+
+    .user-banner .user-avatar {
+        width: 52px;
+        height: 52px;
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+        color: #fff;
+        font-size: 1.1rem;
+        box-shadow: 0 12px 24px rgba(37, 99, 235, 0.25);
+    }
+
+    .user-banner h2 {
+        margin: 0 0 4px;
+        font-size: 1.05rem;
+        font-weight: 800;
+    }
+
+    .user-banner small {
+        color: #64748b;
+    }
+
+    .quick-meta {
+        display: flex;
+        gap: 18px;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+    }
+
+    .quick-meta .meta-item {
+        min-width: 120px;
+    }
+
+    .quick-meta small {
+        display: block;
+        color: #64748b;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        font-weight: 700;
+        margin-bottom: 6px;
+    }
+
+    .quick-meta strong {
+        font-size: 0.95rem;
+    }
+
+    .stat-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 16px;
+        margin-bottom: 20px;
+    }
+
+    .stat-card {
+        padding: 18px 18px 16px;
+        background: rgba(255,255,255,0.96);
+        border: 1px solid rgba(148,163,184,0.18);
+        border-radius: 18px;
+        box-shadow: 0 18px 38px rgba(15, 23, 42, 0.06);
+    }
+
+    .stat-card label {
+        display: block;
+        color: #64748b;
+        font-size: 0.72rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        font-weight: 700;
+        margin-bottom: 8px;
+    }
+
+    .stat-card strong {
+        font-size: 2rem;
+        line-height: 1.2;
+        display: block;
+    }
+
+    .stat-card.total strong { color: #1d4ed8; }
+    .stat-card.pending strong { color: #b45309; }
+    .stat-card.completed strong { color: #047857; }
+
+    .exam-card {
+        overflow: hidden;
+        background: rgba(255,255,255,0.96);
+        border: 1px solid rgba(148,163,184,0.18);
+        border-radius: 20px;
+        box-shadow: 0 18px 38px rgba(15, 23, 42, 0.06);
+    }
+
+    .table-title {
+        padding: 20px 22px 12px;
+        font-weight: 800;
+        color: #1d4ed8;
+        letter-spacing: -0.02em;
+        font-size: 1.25rem;
+    }
+
+    .table-wrap {
+        overflow-x: auto;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 900px;
+    }
+
+    th {
+        background: #f8fafc;
+        color: #64748b;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        font-size: 0.72rem;
+        font-weight: 800;
+        padding: 14px 16px;
+        text-align: left;
+    }
+
+    td {
+        padding: 14px 16px;
+        border-top: 1px solid rgba(148,163,184,0.12);
+        color: #0f172a;
+        vertical-align: middle;
+    }
+
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.5rem 0.7rem;
+        border-radius: 999px;
+        font-size: 0.72rem;
+        font-weight: 700;
+    }
+
+    .status-pending { background: #fff7db; color: #92400e; }
+    .status-completed { background: #dcfce7; color: #166534; }
+    .status-progress { background: #dbeafe; color: #1d4ed8; }
+
+    .btn-primary, .btn-outline-success {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 10px;
+        padding: 0.5rem 0.8rem;
+        font-weight: 700;
+        font-size: 0.8rem;
+        text-decoration: none;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+        color: white;
+    }
+
+    .btn-outline-success {
+        border: 1px solid rgba(22, 101, 52, 0.2);
+        background: rgba(16, 185, 129, 0.08);
+        color: #166534;
+    }
+
+    @media (max-width: 900px) {
+        .dashboard-shell {
+            grid-template-columns: 1fr;
+        }
+
+        .user-banner {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .quick-meta {
+            width: 100%;
+            justify-content: flex-start;
+        }
+
+        .stat-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<div class="app-shell">
+    <aside class="side-panel">
+        <div class="brand"><i class="fa-solid fa-shield-halved me-2"></i>EXAMGUARD</div>
+        <nav class="nav-links-panel">
+            <a class="active" href="{{ url_for('dashboard.dashboard') }}"><i class="fa-solid fa-house"></i> Dashboard</a>
+            <a href="{{ url_for('dashboard.history') }}"><i class="fa-solid fa-clock-rotate-left"></i> Exam History</a>
+            <a href="{{ url_for('dashboard.profile') }}"><i class="fa-solid fa-id-card"></i> Profile</a>
+            <a href="{{ url_for('auth.logout') }}"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+        </nav>
+        <div class="user-pill">
+            <div class="avatar">{{ (candidate.full_name if candidate and candidate.full_name else session.get('user_name', 'C'))[:1]|upper }}</div>
+            <div>
+                <strong>{{ candidate.full_name if candidate and candidate.full_name else session.get('user_name', 'Candidate User') }}</strong>
+                <small>{{ candidate.email if candidate and candidate.email else session.get('email', '') }}</small>
+            </div>
+        </div>
+    </aside>
+
+    <section class="page-main">
+        <div class="panel-card user-banner">
+            <div class="identity">
+                <div class="user-avatar"><i class="fa-solid fa-user"></i></div>
+                <div>
+                    <h2>{{ candidate.full_name if candidate and candidate.full_name else session.get('user_name', 'Candidate User') }}</h2>
+                    <small><i class="fa-regular fa-envelope me-1"></i>{{ candidate.email if candidate and candidate.email else session.get('email', '') }}</small>
+                </div>
+            </div>
+            <div class="quick-meta">
+                <div class="meta-item">
+                    <small>College</small>
+                    <strong>{{ candidate.college if candidate and candidate.college else '-' }}</strong>
+                </div>
+                <div class="meta-item">
+                    <small>Branch</small>
+                    <strong>{{ candidate.branch if candidate and candidate.branch else '-' }}</strong>
+                </div>
+                <div class="meta-item">
+                    <small>Roll</small>
+                    <strong>{{ candidate.roll_number if candidate and candidate.roll_number else '-' }}</strong>
+                </div>
+            </div>
+        </div>
+
+        <div class="stat-grid">
+            <div class="stat-card total">
+                <label>Total Assignments</label>
+                <strong>{{ analytics.total_exams if analytics else 0 }}</strong>
+            </div>
+            <div class="stat-card pending">
+                <label>Pending</label>
+                <strong>{{ analytics.pending if analytics else 0 }}</strong>
+            </div>
+            <div class="stat-card completed">
+                <label>Completed</label>
+                <strong>{{ analytics.completed if analytics else 0 }}</strong>
+            </div>
+        </div>
+
+        <div class="exam-card">
+            <div class="table-title">Assigned Examinations</div>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Examination Title</th>
+                            <th>Duration</th>
+                            <th>Total Marks</th>
+                            <th>Score</th>
+                            <th>Integrity</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if assignments %}
+                            {% for item in assignments %}
+                            <tr>
+                                <td>
+                                    <strong>{{ item.exam_title or item.title }}</strong>
+                                    {% if item.description %}<br><small>{{ item.description }}</small>{% endif %}
+                                </td>
+                                <td>{{ item.duration_minutes }} min</td>
+                                <td>{{ item.total_marks }}</td>
+                                <td>{{ item.score if item.status == 'COMPLETED' and item.score is not none else '-' }}</td>
+                                <td>{{ item.integrity_score ~ '%' if item.integrity_score is not none else '-' }}</td>
+                                <td>
+                                    {% if item.status == 'COMPLETED' %}
+                                        <span class="status-badge status-completed"><i class="fa-solid fa-check me-1"></i>Completed</span>
+                                    {% elif item.status == 'IN_PROGRESS' %}
+                                        <span class="status-badge status-progress">In Progress</span>
+                                    {% else %}
+                                        <span class="status-badge status-pending">Pending</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if item.status == 'COMPLETED' %}
+                                        <a class="btn-outline-success" href="{{ url_for('exam.exam_result', session_id=item.session_id) }}">View Result</a>
+                                    {% else %}
+                                        <a class="btn-primary" href="{{ url_for('exam.pre_exam_verification', assignment_id=item.id) }}">Start Exam</a>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="7" style="text-align:center; color:#64748b; padding:30px 12px;">No pending examinations.</td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock %}

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Instructions & Rules - ExamGuard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f4f6f9; min-height: 100vh; display: flex; flex-direction: column; }
+        .navbar { background-color: #0d1b2a; }
+        .main-container { flex: 1; }
+        footer { background-color: #0d1b2a; color: #8d99ae; }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-dark px-4 py-3">
+        <span class="navbar-brand font-weight-bold">🛡️ ExamGuard <small class="text-muted">OFFICIAL MONITORING PORTAL</small></span>
+        <div>
+            <a href="/dashboard" class="btn btn-outline-light btn-sm me-2">Home</a>
+            <a href="/dashboard" class="btn btn-outline-light btn-sm me-2">Dashboard</a>
+            <a href="/logout" class="btn btn-outline-danger btn-sm">Logout</a>
+        </div>
+    </nav>
+
+    <div class="container main-container my-5">
+        <div class="card shadow-sm mx-auto" style="max-width: 800px;">
+            <div class="card-body p-4">
+                <h4 class="card-title font-weight-bold">System Instructions & Rules</h4>
+                <h6 class="card-subtitle mb-3 text-muted">{{ exam.title if exam else 'Computer Science & AI Fundamentals' }}</h6>
+                
+                <ul class="lh-lg">
+                    <li><strong>Fullscreen Enforcement:</strong> The exam MUST be taken in browser Fullscreen mode. Exiting fullscreen logs a security deduction (-5 points).</li>
+                    <li><strong>Face Monitoring:</strong> Your face must remain visible. If no face is detected for <strong>10 continuous seconds</strong>, the exam will be automatically <strong>TERMINATED</strong>.</li>
+                    <li><strong>Multiple Face Detection:</strong> Only the registered candidate should be present. Detecting multiple faces logs security events (-10 points).</li>
+                    <li><strong>Tab Switch Limit:</strong> Switching browser tabs or windows is restricted. Exceeding <strong>3 tab switches</strong> will immediately terminate the examination.</li>
+                    <li><strong>Navigation:</strong> Questions appear one by one. You can use Next and Previous buttons.</li>
+                </ul>
+
+                <div class="mt-4">
+                    <a href="/exam/start/{{ assignment.id if assignment else 1 }}" class="btn btn-success font-weight-bold px-4 py-2">
+                        I Agree - Launch Fullscreen Exam
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="text-center py-3">
+        <small>ExamGuard Integrity Platform &copy; 2026 Academic B.Tech Final Year Project. All Rights Reserved.</small>
+    </footer>
+</body>
+</html>

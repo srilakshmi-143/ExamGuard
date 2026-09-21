@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block title %}Exam Terminated - ExamGuard{% endblock %}
+
+{% block content %}
+<div class="container py-5" style="max-width: 760px;">
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+        <div class="card-header text-white text-center py-4" style="background: linear-gradient(135deg, #dc2626, #b91c1c);">
+            <i class="bi bi-shield-exclamation fs-1 d-block mb-2"></i>
+            <h2 class="fw-bold mb-1">Exam Terminated</h2>
+            <p class="mb-0 opacity-75">Your exam session was automatically ended by the monitoring system.</p>
+        </div>
+        <div class="card-body p-4 p-md-5">
+            <div class="alert alert-danger rounded-3 mb-4">
+                <strong>Monitoring threshold exceeded.</strong>
+                <div class="mt-2">Your exam session has been automatically terminated because the configured monitoring threshold was exceeded.</div>
+            </div>
+
+            <div class="row g-3 mb-4">
+                <div class="col-md-6">
+                    <div class="border rounded-3 p-3 h-100 bg-light">
+                        <small class="text-uppercase text-muted fw-bold d-block mb-1">Exam</small>
+                        <strong>{{ exam.exam_title if exam and exam.exam_title else 'Examination' }}</strong>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="border rounded-3 p-3 h-100 bg-light">
+                        <small class="text-uppercase text-muted fw-bold d-block mb-1">Final Integrity Score</small>
+                        <strong>{{ exam.integrity_score if exam and exam.integrity_score is not none else 0 }} / 100</strong>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="border rounded-3 p-3 h-100 bg-light">
+                        <small class="text-uppercase text-muted fw-bold d-block mb-1">Termination Reason</small>
+                        <strong>{{ reason or 'Examination terminated.' }}</strong>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="border rounded-3 p-3 h-100 bg-light">
+                        <small class="text-uppercase text-muted fw-bold d-block mb-1">Date and Time</small>
+                        <strong>{{ exam.end_time if exam and exam.end_time else '—' }}</strong>
+                    </div>
+                </div>
+            </div>
+
+            <p class="text-muted mb-4">This terminated attempt is recorded in your examination history. According to the current rules, a terminated attempt can be retaken.</p>
+
+            <div class="d-flex flex-column flex-md-row gap-3">
+                <a href="{{ url_for('dashboard.dashboard') }}" class="btn btn-primary flex-fill py-3 fw-bold rounded-3">Return to Dashboard</a>
+                <a href="{{ url_for('dashboard.history') }}" class="btn btn-outline-secondary flex-fill py-3 fw-bold rounded-3">View Exam History</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

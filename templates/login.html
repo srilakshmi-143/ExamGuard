@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}Login - Candidate Authentication{% endblock %}
+
+{% block content %}
+<div class="auth-wrapper">
+    <div class="auth-card" style="background: rgba(255,255,255,0.96); border-radius: 26px;">
+        <div class="auth-header">
+            <div class="eyebrow" style="color:#1d4ed8;">Secure access</div>
+            <h2>Candidate Portal Login</h2>
+            <p>Enter your registered official email and password to access examinations.</p>
+        </div>
+
+        <form action="{{ url_for('auth.login') }}" method="POST" class="form-grid">
+            <div class="form-group">
+                <label for="email">Official Email Address</label>
+                <input type="email" id="email" name="email" required placeholder="candidate@examguard.edu">
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required placeholder="••••••••">
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block">Sign In to Dashboard</button>
+        </form>
+
+        <div class="auth-footer">
+            <p>Don't have an account? <a href="{{ url_for('auth.register') }}">Register here</a></p>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+
+{% block title %}Face Verification - ExamGuard{% endblock %}
+
+{% block content %}
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-lg border-0 rounded-4">
+                <div class="card-header bg-primary text-white p-4 rounded-top-4">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <h4 class="mb-0 fw-bold"><i class="bi bi-person-bounding-box me-2"></i>Candidate Identity Verification</h4>
+                        <span class="badge bg-light text-primary fw-semibold px-3 py-2">Pre-Exam Check</span>
+                    </div>
+                </div>
+
+                <div class="card-body p-4">
+                    <div class="alert alert-info border-0 shadow-sm mb-4">
+                        <i class="bi bi-info-circle-fill me-2"></i>
+                        Please align your face inside the camera view and click <strong>Verify Identity</strong> to unlock your examination.
+                    </div>
+
+                    <div class="row g-4 align-items-center">
+                        <!-- Camera Stream Box -->
+                        <div class="col-md-7 text-center">
+                            <div class="position-relative bg-dark rounded-3 overflow-hidden shadow-sm" style="height: 280px;">
+                                <video id="webcam" class="w-100 h-100" style="object-fit: cover;" autoplay playsinline muted></video>
+                                <canvas id="captureCanvas" style="display:none;"></canvas>
+                                <div id="scanOverlay" class="position-absolute top-50 start-50 translate-middle border border-2 border-warning rounded-circle" style="width: 180px; height: 180px; opacity: 0.7;"></div>
+                            </div>
+                            <small class="text-muted d-block mt-2" id="cameraStatus">Initializing camera...</small>
+                        </div>
+
+                        <!-- Details & Action Panel -->
+                        <div class="col-md-5">
+                            <div class="border rounded-3 p-3 bg-light mb-3">
+                                <h6 class="fw-bold text-secondary mb-2">Examination Details</h6>
+                                <p class="mb-1"><strong>Title:</strong> {{ assignment.title if assignment else 'Python Core & Advanced Concepts' }}</p>
+                                <p class="mb-1"><strong>Session Token:</strong> <code class="small text-danger">{{ session_token[:8] if session_token else '3e0131d5' }}...</code></p>
+                            </div>
+
+                            <div id="verifyAlert" class="alert alert-danger d-none" role="alert"></div>
+
+                            <button id="verifyBtn" onclick="performVerification()" class="btn btn-primary w-100 py-3 fw-bold fs-6 shadow-sm">
+                                <i class="bi bi-shield-check me-2"></i>Verify Identity
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    const video = document.getElementById('webcam');
+    const canvas = document.getElementById('captureCanvas');
+    const cameraStatus = document.getElementById('cameraStatus');
+    const verifyBtn = document.getElementById('verifyBtn');
+    const verifyAlert = document.getElementById('verifyAlert');
+    
+    const fallbackRedirectUrl = "/exam/start/{{ assignment.id if assignment else 1 }}";
+
+    // Access user camera stream
+    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+        navigator.mediaDevices.getUserMedia({ video: { width: 640, height: 480 } })
+            .then(stream => {
+                video.srcObject = stream;
+                cameraStatus.textContent = "🟢 Camera active. Position your face in the box.";
+            })
+            .catch(err => {
+                cameraStatus.textContent = "🔴 Camera permission denied.";
+                showAlert("Camera access required for identity verification.", "danger");
+            });
+    }
+
+    function showAlert(message, type) {
+        verifyAlert.className = `alert alert-${type} mt-3`;
+        verifyAlert.textContent = message;
+        verifyAlert.classList.remove('d-none');
+    }
+
+    function requestFullScreenMode() {
+        const elem = document.documentElement;
+        if (elem.requestFullscreen) {
+            elem.requestFullscreen().catch(() => {});
+        } else if (elem.webkitRequestFullscreen) {
+            elem.webkitRequestFullscreen();
+        } else if (elem.msRequestFullscreen) {
+            elem.msRequestFullscreen();
+        }
+    }
+
+    async function performVerification() {
+        verifyBtn.disabled = true;
+        verifyBtn.innerHTML = `<span class="spinner-border spinner-border-sm me-2"></span>Verifying Identity...`;
+        verifyAlert.classList.add('d-none');
+
+        // Capture current camera frame to base64
+        const context = canvas.getContext('2d');
+        canvas.width = video.videoWidth || 640;
+        canvas.height = video.videoHeight || 480;
+        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+        const imageData = canvas.toDataURL('image/jpeg', 0.85);
+
+        try {
+            const response = await fetch('/api/verify_face', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    image_data: imageData,
+                    session_token: "{{ session_token }}",
+                    session_id: Number("{{ session_id|default(0, true)|int }}")
+                })
+            });
+
+            const data = await response.json();
+
+            if (data.success || data.verified) {
+                showAlert("Identity Verified! Opening examination portal...", "success");
+                requestFullScreenMode();
+                setTimeout(() => {
+                    window.location.href = data.redirect_url || fallbackRedirectUrl;
+                }, 800);
+            } else {
+                showAlert(data.message || "Face verification failed. Please align your face clearly and try again.", "danger");
+                verifyBtn.disabled = false;
+                verifyBtn.innerHTML = `<i class="bi bi-arrow-counterclockwise me-2"></i>Retry Verification`;
+            }
+        } catch (error) {
+            showAlert("Verification error. Please ensure clear lighting and try again.", "danger");
+            verifyBtn.disabled = false;
+            verifyBtn.innerHTML = `<i class="bi bi-arrow-counterclockwise me-2"></i>Retry Verification`;
+        }
+    }
+</script>
+{% endblock %}

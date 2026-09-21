@@ -1,0 +1,362 @@
+{% extends "base.html" %}
+
+{% block title %}ExamGuard | Smart Examination Monitoring{% endblock %}
+
+{% block content %}
+<style>
+    .portal-home {
+        width: 100%;
+        min-height: calc(100vh - 120px);
+        background: linear-gradient(180deg, #f5f9ff 0%, #edf4fb 100%);
+        color: #0f172a;
+    }
+
+    .portal-nav {
+        background: rgba(15, 23, 42, 0.96);
+        color: #fff;
+        padding: 18px max(24px, calc((100% - 1220px) / 2));
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 24px;
+        box-shadow: 0 8px 24px rgba(15, 23, 42, 0.12);
+    }
+
+    .portal-brand {
+        color: #fff;
+        text-decoration: none;
+        font-size: 1.3rem;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+    }
+
+    .portal-links {
+        display: flex;
+        gap: 24px;
+        align-items: center;
+    }
+
+    .portal-links a {
+        color: #dbe9fb;
+        text-decoration: none;
+        font-size: 0.92rem;
+        font-weight: 600;
+        transition: color 0.2s ease;
+    }
+
+    .portal-links a:hover { color: #fff; }
+
+    .portal-hero {
+        background: #f5f7fa;
+        color: #172033;
+        padding: 90px max(24px, calc((100% - 1220px) / 2)) 72px;
+        display: grid;
+        grid-template-columns: 1.12fr 0.88fr;
+        gap: 64px;
+        align-items: center;
+    }
+
+    .portal-hero h1 {
+        font-size: clamp(2.5rem, 4vw, 4.6rem);
+        line-height: 1.06;
+        margin: 16px 0 22px;
+        max-width: 720px;
+        letter-spacing: -0.05em;
+    }
+
+    .portal-hero p {
+        color: #64748b;
+        max-width: 660px;
+        font-size: 1.08rem;
+        line-height: 1.75;
+    }
+
+    .eyebrow {
+        color: #1d4ed8;
+        font-size: 0.78rem;
+        font-weight: 800;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+    }
+
+    .hero-actions {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-top: 30px;
+    }
+
+    .hero-actions a {
+        border-radius: 12px;
+        padding: 14px 22px;
+        text-decoration: none;
+        font-weight: 800;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .hero-actions a:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 10px 22px rgba(15, 23, 42, 0.18);
+    }
+
+    .hero-primary {
+        background: #15803d;
+        color: #fff;
+    }
+
+    .hero-secondary {
+        background: #fff;
+        border: 1px solid #cbd5e1;
+        color: #0f2747;
+    }
+
+    .security-panel {
+        border: 1px solid #e2e8f0;
+        background: #fff;
+        padding: 24px;
+        border-radius: 20px;
+        box-shadow: 0 16px 36px rgba(15,23,42,0.08);
+    }
+
+    .security-screen {
+        height: 270px;
+        border-radius: 18px;
+        background: #eef4f8;
+        border: 1px solid #cbd5e1;
+        padding: 18px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .screen-line {
+        height: 9px;
+        background: #b8cad8;
+        border-radius: 999px;
+        margin-bottom: 12px;
+        width: 72%;
+    }
+
+    .screen-line.short { width: 44%; }
+
+    .scan-frame {
+        position: absolute;
+        left: 24%;
+        top: 22%;
+        width: 52%;
+        height: 52%;
+        border: 2px solid #22d3ee;
+        border-radius: 14px;
+        box-shadow: 0 0 0 999px rgba(2,15,35,0.22);
+    }
+
+    .scan-label {
+        position: absolute;
+        bottom: 18px;
+        left: 18px;
+        color: #67e8f9;
+        font-size: 0.78rem;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+    }
+
+    .portal-section {
+        max-width: 1220px;
+        margin: 0 auto;
+        padding: 78px 24px;
+    }
+
+    .portal-section h2 {
+        font-size: clamp(1.8rem, 2.5vw, 2.7rem);
+        margin-bottom: 10px;
+        letter-spacing: -0.04em;
+    }
+
+    .section-lead {
+        color: #64748b;
+        max-width: 700px;
+        line-height: 1.75;
+        font-size: 1.02rem;
+    }
+
+    .portal-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0,1fr));
+        gap: 18px;
+        margin-top: 30px;
+    }
+
+    .portal-card {
+        background: rgba(255,255,255,0.94);
+        border: 1px solid rgba(148,163,184,0.18);
+        border-radius: 18px;
+        padding: 22px;
+        min-height: 190px;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        box-shadow: 0 12px 32px rgba(15,23,42,0.04);
+    }
+
+    .portal-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 16px 40px rgba(15,23,42,0.1);
+    }
+
+    .portal-icon {
+        width: 42px;
+        height: 42px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, #dbeafe 0%, #e0e7ff 100%);
+        color: #1d4ed8;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
+        font-weight: 800;
+    }
+
+    .portal-card h3 {
+        font-size: 1.04rem;
+        margin: 18px 0 10px;
+    }
+
+    .portal-card p {
+        color: #64748b;
+        font-size: 0.92rem;
+        line-height: 1.7;
+    }
+
+    .steps {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0,1fr));
+        gap: 18px;
+        margin-top: 30px;
+    }
+
+    .step {
+        background: rgba(255,255,255,0.8);
+        border: 1px solid rgba(148,163,184,0.18);
+        border-top: 4px solid #2563eb;
+        border-radius: 18px;
+        padding: 18px 18px 20px;
+        box-shadow: 0 10px 26px rgba(15, 23, 42, 0.04);
+    }
+
+    .step strong {
+        color: #1d4ed8;
+        font-size: 0.72rem;
+        letter-spacing: 0.12em;
+    }
+
+    .step h3 {
+        margin: 12px 0 8px;
+        font-size: 1.08rem;
+    }
+
+    .step p {
+        color: #64748b;
+        line-height: 1.7;
+        font-size: 0.9rem;
+    }
+
+    @media (max-width: 850px) {
+        .portal-hero {
+            grid-template-columns: 1fr;
+            padding-top: 70px;
+        }
+
+        .portal-grid {
+            grid-template-columns: repeat(2, minmax(0,1fr));
+        }
+
+        .steps {
+            grid-template-columns: 1fr;
+        }
+
+        .portal-links { display: none; }
+    }
+
+    @media (max-width: 520px) {
+        .portal-grid { grid-template-columns: 1fr; }
+    }
+</style>
+<div class="portal-home">
+    <header class="portal-nav">
+        <a class="portal-brand" href="{{ url_for('home.home') }}">EXAMGUARD</a>
+        <nav class="portal-links" aria-label="Main navigation">
+            <a href="{{ url_for('home.home') }}">Home</a>
+            <a href="#about">About</a>
+            <a href="#features">Features</a>
+            <a href="#workflow">How It Works</a>
+            <a href="{{ url_for('auth.login') }}">Login</a>
+            <a href="{{ url_for('auth.register') }}">Register</a>
+        </nav>
+    </header>
+    <section class="portal-hero" id="about">
+        <div>
+            <div class="eyebrow">Secure academic assessment platform</div>
+            <h1>Smart Examination Monitoring &amp; Reporting System</h1>
+            <p>A secure, intelligent and automated platform for online examinations with identity verification, live proctoring and examination integrity analysis.</p>
+            <div class="hero-actions">
+                {% if session.get('user_id') %}
+                    <a class="hero-primary" href="{{ url_for('dashboard.dashboard') }}">Candidate Dashboard</a>
+                {% else %}
+                    <a class="hero-primary" href="{{ url_for('auth.login') }}">Candidate Login</a>
+                    <a class="hero-secondary" href="{{ url_for('auth.register') }}">Register Candidate</a>
+                {% endif %}
+            </div>
+        </div>
+        <div class="security-panel" aria-label="Exam monitoring preview">
+            <div class="eyebrow">Live integrity console</div>
+            <div class="security-screen mt-3">
+                <div class="screen-line"></div>
+                <div class="screen-line short"></div>
+                <div class="scan-frame"></div>
+                <div class="scan-label">Identity Verified / Single Face</div>
+            </div>
+        </div>
+    </section>
+
+    <section class="portal-section" id="features">
+        <div class="eyebrow">Platform capabilities</div>
+        <h2>Designed for accountable examinations</h2>
+        <p class="section-lead">ExamGuard combines candidate identity, browser signals and computer-vision events into a traceable examination record.</p>
+        <div class="portal-grid">
+            {% for icon,title,text in [
+                ('01','Identity Verification','Candidate identity is checked against the registered photograph before the exam.'),
+                ('02','Live Face Monitoring','The webcam monitors candidate presence throughout the examination.'),
+                ('03','Multiple Face Detection','Additional faces are detected and recorded as integrity events.'),
+                ('04','Tab Switching Detection','Visibility and browser focus changes are logged for review.'),
+                ('05','Fullscreen Monitoring','Fullscreen exits are detected and require the candidate to return.'),
+                ('06','Integrity Score','A live score summarizes supported examination events.'),
+                ('07','Examination Analytics','Scores, timing and integrity events remain available for reporting.'),
+                ('08','Examination History','Completed and terminated attempts stay available to the candidate.')
+            ] %}
+                <article class="portal-card">
+                    <div class="portal-icon">{{ icon }}</div>
+                    <h3>{{ title }}</h3>
+                    <p>{{ text }}</p>
+                </article>
+            {% endfor %}
+        </div>
+    </section>
+
+    <section class="portal-section" id="workflow" style="background:#eef6fa;max-width:none;padding-left:max(24px,calc((100% - 1220px)/2));padding-right:max(24px,calc((100% - 1220px)/2));">
+        <div class="eyebrow">System workflow</div>
+        <h2>From registration to report</h2>
+        <div class="steps">
+            {% for number,title,text in [
+                ('01','Register','Create a candidate account and register identity information.'),
+                ('02','Identity Verification','Compare a live camera frame with the registered photograph.'),
+                ('03','Secure Examination','Start the examination in fullscreen with live webcam monitoring.'),
+                ('04','Integrity Monitoring','Record face, browser and supported object-detection events.'),
+                ('05','Result & Report','Store the score, integrity information and examination history.')
+            ] %}
+                <div class="step">
+                    <strong>STEP {{ number }}</strong>
+                    <h3>{{ title }}</h3>
+                    <p>{{ text }}</p>
+                </div>
+            {% endfor %}
+        </div>
+    </section>
+</div>
+{% endblock %}

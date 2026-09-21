@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ExamGuard - Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        body { background-color: #f4f6f9; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        .sidebar { width: 250px; height: 100vh; position: fixed; top: 0; left: 0; background: #ffffff; border-right: 1px solid #e9ecef; z-index: 100; padding-top: 1rem; }
+        .sidebar .nav-link { color: #495057; font-weight: 500; padding: 12px 20px; display: flex; align-items: center; gap: 12px; border-radius: 8px; margin: 4px 12px; cursor: pointer; }
+        .sidebar .nav-link:hover, .sidebar .nav-link.active { background-color: #f0f4ff; color: #0d6efd; }
+        .main-content { margin-left: 250px; padding: 2rem; }
+        .stat-card { border: none; border-radius: 10px; }
+    </style>
+</head>
+<body>
+
+    <!-- Left Column Navigation (Sidebar) -->
+    <div class="sidebar d-flex flex-column justify-content-between">
+        <div>
+            <div class="px-4 py-3 d-flex align-items-center gap-2 border-bottom mb-3">
+                <i class="bi bi-shield-check text-primary fs-3"></i>
+                <span class="fw-bold fs-5 text-dark">EXAMGUARD</span>
+            </div>
+            <nav class="nav flex-column">
+                <a class="nav-link active" id="tab-overview-btn" onclick="switchTab('overview')"><i class="bi bi-house-door fs-5"></i> Dashboard</a>
+                <a class="nav-link" id="tab-history-btn" onclick="switchTab('history')"><i class="bi bi-clock-history fs-5"></i> Exam History</a>
+            </nav>
+        </div>
+        <div class="p-3 border-top">
+            <a href="/logout" class="btn btn-outline-danger w-100"><i class="bi bi-box-arrow-right"></i> Logout</a>
+        </div>
+    </div>
+
+    <!-- Main Content Area -->
+    <div class="main-content">
+        <!-- User Profile Banner -->
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body p-4 d-flex align-items-center justify-content-between">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center fs-3" style="width:56px; height:56px;">
+                        <i class="bi bi-person"></i>
+                    </div>
+                    <div>
+                        <h5 class="mb-0 fw-bold">{{ profile.full_name if profile and profile.full_name else 'Candidate User' }}</h5>
+                        <small class="text-muted"><i class="bi bi-envelope"></i> {{ profile.email if profile and profile.email else 'candidate@gmail.com' }}</small>
+                    </div>
+                </div>
+                <div class="d-flex gap-4 text-center text-muted small">
+                    <div><strong class="d-block text-dark">College</strong>{{ profile.college if profile and profile.college else 'Engineering College' }}</div>
+                    <div><strong class="d-block text-dark">Branch</strong>{{ profile.branch if profile and profile.branch else 'Computer Science' }}</div>
+                    <div><strong class="d-block text-dark">Roll Number</strong>{{ profile.roll_number if profile and profile.roll_number else 'REG-2024-001' }}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dashboard Main View -->
+        <div id="view-overview">
+            <!-- Metrics Summary Cards -->
+            <div class="row g-3 mb-4 text-center">
+                <div class="col-md-3">
+                    <div class="card stat-card p-3 shadow-sm bg-white">
+                        <span class="text-muted small fw-bold">Total Assignments</span>
+                        <h3 class="text-primary fw-bold mt-1">{{ stats.total }}</h3>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card stat-card p-3 shadow-sm bg-white">
+                        <span class="text-muted small fw-bold">Pending</span>
+                        <h3 class="text-warning fw-bold mt-1">{{ stats.pending }}</h3>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card stat-card p-3 shadow-sm bg-white">
+                        <span class="text-muted small fw-bold">Completed</span>
+                        <h3 class="text-success fw-bold mt-1">{{ stats.completed }}</h3>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card stat-card p-3 shadow-sm bg-white">
+                        <span class="text-muted small fw-bold">Terminated</span>
+                        <h3 class="text-danger fw-bold mt-1">{{ stats.terminated }}</h3>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Assigned Examinations Table -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white py-3 fw-bold text-primary">Assigned Examinations</div>
+                <div class="table-responsive">
+                    <table class="table align-middle mb-0">
+                        <thead class="table-light small">
+                            <tr>
+                                <th>Examination Title</th>
+                                <th>Duration</th>
+                                <th>Total Marks</th>
+                                <th>Score</th>
+                                <th>Integrity</th>
+                                <th>Status</th>
+                                <th class="text-end pe-4">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for exam in assigned_exams %}
+                            <tr>
+                                <td><strong>{{ exam.title }}</strong><br><small class="text-muted">{{ exam.description }}</small></td>
+                                <td>{{ exam.duration }} Mins</td>
+                                <td>{{ exam.total_marks }}</td>
+                                <td>{{ exam.score if exam.score is not none else '--' }}</td>
+                                <td>{{ exam.integrity_score if exam.integrity_score is not none else '--' }}</td>
+                                <td>
+                                    <span class="badge {% if exam.status == 'Completed' %}bg-success{% elif exam.status == 'Terminated' %}bg-danger{% else %}bg-warning text-dark{% endif %}">
+                                        {{ exam.status }}
+                                    </span>
+                                </td>
+                                <td class="text-end pe-4">
+                                    {% if exam.status in ['Completed', 'Terminated'] %}
+                                        <button class="btn btn-sm btn-secondary" disabled>Submitted</button>
+                                    {% else %}
+                                        <a href="/exam/verify/{{ exam.id }}" class="btn btn-sm btn-primary px-3">Start Exam</a>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- History Separate View -->
+        <div id="view-history" style="display: none;">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white py-3 fw-bold text-dark"><i class="bi bi-clock-history me-2"></i>Candidate History & Termination Logs</div>
+                <div class="table-responsive">
+                    <table class="table align-middle mb-0">
+                        <thead class="table-light small">
+                            <tr>
+                                <th>Examination Title</th>
+                                <th>Timestamp</th>
+                                <th>Score</th>
+                                <th>Status</th>
+                                <th>Notes / Termination Reason</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if exam_history and exam_history|length > 0 %}
+                                {% for h in exam_history %}
+                                <tr>
+                                    <td class="fw-bold">{{ h.title }}</td>
+                                    <td>{{ h.completed_at }}</td>
+                                    <td>{{ h.score }} / {{ h.total }}</td>
+                                    <td>
+                                        <span class="badge {% if h.status == 'Terminated' %}bg-danger{% else %}bg-success{% endif %}">
+                                            {{ h.status }}
+                                        </span>
+                                    </td>
+                                    <td class="small text-muted">{{ h.termination_reason if h.termination_reason else 'None (Successfully Completed)' }}</td>
+                                </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td colspan="5" class="text-center py-4 text-muted">No examination history available.</td>
+                                </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function switchTab(tab) {
+            if (tab === 'overview') {
+                document.getElementById('view-overview').style.display = 'block';
+                document.getElementById('view-history').style.display = 'none';
+                document.getElementById('tab-overview-btn').classList.add('active');
+                document.getElementById('tab-history-btn').classList.remove('active');
+            } else {
+                document.getElementById('view-overview').style.display = 'none';
+                document.getElementById('view-history').style.display = 'block';
+                document.getElementById('tab-overview-btn').classList.remove('active');
+                document.getElementById('tab-history-btn').classList.add('active');
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}Examination Result - ExamGuard{% endblock %}
+
+{% block content %}
+<div class="result-wrapper">
+    <div class="result-card">
+        <div class="result-header green">
+            <h2>Examination Completed</h2>
+            <p>{{ assignment.title if assignment else 'Examination Results' }}</p>
+        </div>
+
+        <div class="result-metrics-grid">
+            <div class="metric-box">
+                <span class="metric-label">Marks Obtained</span>
+                <span class="metric-val">{{ result.score if result else 0 }} / {{ result.total_questions if result else 0 }}</span>
+            </div>
+            <div class="metric-box">
+                <span class="metric-label">Percentage</span>
+                <span class="metric-val">{{ result.percentage if result else 0 }}%</span>
+            </div>
+            <div class="metric-box">
+                <span class="metric-label">Integrity Score</span>
+                <span class="metric-val {{ 'green' if result and result.final_integrity_score >= 80 else 'red' }}">
+                    {{ result.final_integrity_score if result else 0 }} / 100
+                </span>
+            </div>
+            <div class="metric-box">
+                <span class="metric-label">Total Violations</span>
+                <span class="metric-val">{{ result.total_violations if result else 0 }}</span>
+            </div>
+        </div>
+
+        <div class="result-actions">
+            <a href="{{ url_for('dashboard.dashboard') }}" class="btn btn-primary btn-lg">GO TO DASHBOARD</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

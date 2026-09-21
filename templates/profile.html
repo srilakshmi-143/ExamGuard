@@ -1,0 +1,270 @@
+{% extends "base.html" %}
+{% block title %}Candidate Profile - ExamGuard{% endblock %}
+{% block content %}
+<style>
+    .profile-shell {
+        display: grid;
+        grid-template-columns: 220px minmax(0, 1fr);
+        gap: 20px;
+        width: 100%;
+        align-items: start;
+    }
+
+    .profile-panel {
+        background: rgba(255,255,255,0.96);
+        border: 1px solid rgba(148,163,184,0.18);
+        border-radius: 20px;
+        box-shadow: 0 18px 38px rgba(15, 23, 42, 0.06);
+        padding: 24px;
+    }
+
+    .profile-header {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid rgba(148,163,184,0.15);
+        margin-bottom: 20px;
+    }
+
+    .profile-photo,
+    .profile-placeholder {
+        width: 96px;
+        height: 96px;
+        border-radius: 22px;
+        object-fit: cover;
+        display: grid;
+        place-items: center;
+        box-shadow: 0 14px 28px rgba(37,99,235,0.14);
+    }
+
+    .profile-placeholder {
+        background: linear-gradient(135deg, #dbeafe 0%, #d1fae5 100%);
+        color: #1d4ed8;
+        font-size: 2rem;
+    }
+
+    .eyebrow {
+        display: inline-block;
+        color: #1d4ed8;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        font-size: 0.7rem;
+        font-weight: 700;
+        margin-bottom: 8px;
+    }
+
+    .profile-header h2 {
+        margin: 0;
+        font-size: clamp(1.5rem, 2vw, 2rem);
+        line-height: 1.2;
+    }
+
+    .profile-header .muted-subtle {
+        color: #64748b;
+        margin-top: 6px;
+    }
+
+    .profile-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 20px;
+    }
+
+    .profile-card-section {
+        background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+        border: 1px solid rgba(148,163,184,0.15);
+        border-radius: 18px;
+        padding: 20px;
+    }
+
+    .profile-card-section h3 {
+        margin: 0 0 16px;
+        font-size: 1.06rem;
+        font-weight: 800;
+    }
+
+    .profile-fields {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px;
+    }
+
+    .profile-field {
+        background: #f8fafc;
+        border: 1px solid rgba(148,163,184,0.14);
+        border-radius: 12px;
+        padding: 14px 16px;
+        min-width: 0;
+    }
+
+    .profile-field label {
+        display: block;
+        margin-bottom: 6px;
+        color: #64748b;
+        font-size: 0.72rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        font-weight: 700;
+    }
+
+    .profile-field strong {
+        display: block;
+        color: #0f172a;
+        font-weight: 700;
+        line-height: 1.5;
+        word-break: break-word;
+    }
+
+    .profile-stat-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+
+    .profile-stat-card {
+        flex: 1 1 calc(50% - 12px);
+        min-width: 140px;
+        border-radius: 16px;
+        padding: 16px 14px;
+        border: 1px solid rgba(148,163,184,0.15);
+        background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+    }
+
+    .profile-stat-card .label {
+        display: block;
+        color: #64748b;
+        font-size: 0.72rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        font-weight: 700;
+        margin-bottom: 8px;
+    }
+
+    .profile-stat-card strong {
+        display: block;
+        font-size: 1.8rem;
+        line-height: 1.2;
+        font-weight: 800;
+    }
+
+    .metric-blue { background: linear-gradient(135deg, #eff6ff, #f8fbff); }
+    .metric-green { background: linear-gradient(135deg, #ecfdf5, #f8fffb); }
+    .metric-amber { background: linear-gradient(135deg, #fff7ed, #fffdf8); }
+    .metric-violet { background: linear-gradient(135deg, #f5f3ff, #faf8ff); }
+
+    .metric-blue strong { color: #1d4ed8; }
+    .metric-green strong { color: #047857; }
+    .metric-amber strong { color: #b45309; }
+    .metric-violet strong { color: #6d28d9; }
+
+    @media (max-width: 900px) {
+        .profile-shell {
+            grid-template-columns: 1fr;
+        }
+
+        .profile-grid,
+        .profile-fields {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<div class="app-shell">
+    <aside class="side-panel">
+        <div class="brand"><i class="fa-solid fa-shield-halved me-2"></i>EXAMGUARD</div>
+        <nav class="nav-links-panel">
+            <a href="{{ url_for('dashboard.dashboard') }}"><i class="fa-solid fa-house"></i> Dashboard</a>
+            <a href="{{ url_for('dashboard.history') }}"><i class="fa-solid fa-clock-rotate-left"></i> Exam History</a>
+            <a class="active" href="{{ url_for('dashboard.profile') }}"><i class="fa-solid fa-id-card"></i> Profile</a>
+            <a href="{{ url_for('auth.logout') }}"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+        </nav>
+        <div class="user-pill">
+            <div class="avatar">{{ (candidate.full_name if candidate and candidate.full_name else session.get('user_name', 'C'))[:1]|upper }}</div>
+            <div>
+                <strong>{{ candidate.full_name if candidate and candidate.full_name else session.get('user_name', 'Candidate User') }}</strong>
+                <small>{{ candidate.email if candidate and candidate.email else session.get('email', '') }}</small>
+            </div>
+        </div>
+    </aside>
+
+    <main class="page-main">
+        <div class="profile-panel">
+            <div class="profile-header">
+                {% if candidate and candidate.get('photo_path') %}
+                    <img class="profile-photo" src="{{ url_for('dashboard.profile_photo') }}" alt="Profile photo">
+                {% else %}
+                    <div class="profile-placeholder"><i class="fa-solid fa-user"></i></div>
+                {% endif %}
+                <div>
+                    <div class="eyebrow">Candidate Identity</div>
+                    <h2>{{ candidate.get('full_name') or candidate.get('username') or 'Candidate User' }}</h2>
+                    <div class="muted-subtle">{{ candidate.get('email') or '-' }}</div>
+                </div>
+            </div>
+
+            <div class="profile-grid">
+                <div class="profile-card-section">
+                    <h3>Personal & Academic Info</h3>
+                    <div class="profile-fields">
+                        <div class="profile-field">
+                            <label>Name</label>
+                            <strong>{{ candidate.get('full_name') or candidate.get('username') or '-' }}</strong>
+                        </div>
+                        <div class="profile-field">
+                            <label>Email</label>
+                            <strong>{{ candidate.get('email') or '-' }}</strong>
+                        </div>
+                        <div class="profile-field">
+                            <label>College</label>
+                            <strong>{{ candidate.get('college') or '-' }}</strong>
+                        </div>
+                        <div class="profile-field">
+                            <label>Branch / Course</label>
+                            <strong>{{ candidate.get('branch') or '-' }}</strong>
+                        </div>
+                        <div class="profile-field">
+                            <label>Year</label>
+                            <strong>{{ candidate.get('year') or '-' }}</strong>
+                        </div>
+                        <div class="profile-field">
+                            <label>Roll Number</label>
+                            <strong>{{ candidate.get('roll_number') or '-' }}</strong>
+                        </div>
+                        <div class="profile-field">
+                            <label>Role</label>
+                            <strong>{{ (candidate.get('role') or 'student')|title }}</strong>
+                        </div>
+                        <div class="profile-field">
+                            <label>Registration Date</label>
+                            <strong>{{ candidate.get('created_at') or '-' }}</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="profile-card-section">
+                    <h3>Account Activity Overview</h3>
+                    <div class="profile-stat-grid">
+                        <div class="profile-stat-card metric-blue">
+                            <span class="label">Assignments</span>
+                            <strong>{{ profile_stats.total_assignments }}</strong>
+                        </div>
+                        <div class="profile-stat-card metric-green">
+                            <span class="label">Completed</span>
+                            <strong>{{ profile_stats.completed }}</strong>
+                        </div>
+                        <div class="profile-stat-card metric-amber">
+                            <span class="label">Pending</span>
+                            <strong>{{ profile_stats.pending }}</strong>
+                        </div>
+                        <div class="profile-stat-card metric-violet">
+                            <span class="label">Attempts</span>
+                            <strong>{{ profile_stats.attempts }}</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+{% endblock %}

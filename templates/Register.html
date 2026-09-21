@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+
+{% block title %}Register - Candidate Onboarding{% endblock %}
+
+{% block content %}
+<div class="auth-wrapper wide">
+    <div class="auth-card" style="border-radius: 28px; background: rgba(255,255,255,0.97);">
+        <div class="auth-header">
+            <div class="eyebrow" style="color:#1d4ed8;">Onboarding</div>
+            <h2>Candidate Registration &amp; Photo Capture</h2>
+            <p>Please complete your profile and capture your identity photo via webcam.</p>
+        </div>
+
+        <form action="{{ url_for('auth.register') }}" method="POST" id="registerForm" class="form-grid-2col">
+            <input type="hidden" name="photo_data" id="photoData">
+
+            <div class="form-col">
+                <h3 style="font-size:1.15rem; font-weight:800;">1. Personal &amp; Academic Details</h3>
+
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" name="full_name" required placeholder="John Doe">
+                </div>
+
+                <div class="form-group">
+                    <label>Email Address</label>
+                    <input type="email" name="email" required placeholder="john@example.com">
+                </div>
+
+                <div class="form-row-2">
+                    <div class="form-group">
+                        <label>Date of Birth</label>
+                        <input type="date" name="dob" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Gender</label>
+                        <select name="gender" required>
+                            <option value="">Select</option>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Phone Number</label>
+                    <input type="tel" name="phone" required placeholder="+91 9876543210">
+                </div>
+
+                <div class="form-group">
+                    <label>College / Institution</label>
+                    <input type="text" name="college" required placeholder="National Institute of Technology">
+                </div>
+
+                <div class="form-row-2">
+                    <div class="form-group">
+                        <label>Course</label>
+                        <input type="text" name="course" required placeholder="B.Tech CS">
+                    </div>
+                    <div class="form-group">
+                        <label>Year of Study</label>
+                        <input type="text" name="year_of_study" required placeholder="4th Year">
+                    </div>
+                </div>
+
+                <div class="form-row-2">
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" name="password" id="password" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Confirm Password</label>
+                        <input type="password" name="confirm_password" id="confirm_password" required>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-col webcam-col">
+                <h3 style="font-size:1.15rem; font-weight:800;">2. Biometric Registration Photo</h3>
+                <p class="help-text">Your photo is stored in SQLite for pre-exam verification and identity matching.</p>
+
+                <div class="webcam-box">
+                    <video id="webcamVideo" autoplay playsinline muted></video>
+                    <canvas id="photoCanvas" style="display:none;"></canvas>
+                    <img id="capturedPreview" style="display:none;" alt="Captured preview">
+                </div>
+
+                <div class="webcam-controls">
+                    <button type="button" id="startCamBtn" class="btn btn-secondary">Start Camera</button>
+                    <button type="button" id="captureBtn" class="btn btn-primary" style="display:none;">Capture Photograph</button>
+                    <button type="button" id="retakeBtn" class="btn btn-outline" style="display:none;">Retake Photo</button>
+                </div>
+
+                <div id="camStatus" class="cam-status">Camera status: Idle</div>
+
+                <button type="submit" id="submitBtn" class="btn btn-success btn-block mt-4" disabled>Complete Registration</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/Registration.js') }}"></script>
+{% endblock %}

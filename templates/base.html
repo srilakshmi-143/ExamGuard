@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}ExamGuard - Smart Examination Monitoring Platform{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        :root {
+            --sidebar-width: 220px;
+            --topbar-height: 72px;
+            --bg-soft: #f4f7fb;
+            --panel: #ffffff;
+            --panel-soft: #f8fafc;
+            --border: rgba(148, 163, 184, 0.2);
+            --text: #0f172a;
+            --muted: #64748b;
+            --primary: #1d4ed8;
+            --primary-soft: #e8f2ff;
+            --success: #10b981;
+            --success-soft: #dcfce7;
+            --warning: #f59e0b;
+            --warning-soft: #fff7db;
+            --shadow-soft: 0 16px 34px rgba(15, 23, 42, 0.08);
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            background: var(--bg-soft);
+            color: var(--text);
+            min-height: 100vh;
+            font-family: "Segoe UI", Arial, sans-serif;
+        }
+
+        a { color: inherit; }
+
+        .navbar {
+            position: sticky;
+            top: 0;
+            z-index: 1100;
+            background: rgba(15, 23, 42, 0.96);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(148, 163, 184, 0.18);
+            box-shadow: 0 12px 18px rgba(15, 23, 42, 0.12);
+            height: var(--topbar-height);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            width: calc(100% - 32px);
+            margin: 0 auto;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        .brand-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #fff;
+            text-decoration: none;
+            font-weight: 800;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+        }
+
+        .brand-logo .brand-name {
+            font-size: 1.12rem;
+        }
+
+        .badge-gov {
+            display: inline-flex;
+            align-items: center;
+            padding: 5px 10px;
+            border-radius: 999px;
+            background: rgba(148, 163, 184, 0.12);
+            border: 1px solid rgba(148, 163, 184, 0.24);
+            color: #dfeaf8;
+            font-size: 0.6rem;
+            letter-spacing: 0.12em;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .nav-links a {
+            color: #dfeaf8;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: color 0.2s ease;
+        }
+
+        .nav-links a:hover {
+            color: #fff;
+        }
+
+        .nav-links .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            padding: 0.7rem 1rem;
+            font-weight: 700;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        .nav-links .btn-outline {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: #fff;
+        }
+
+        .nav-links .btn-secondary {
+            background: rgba(255,255,255,0.08);
+            color: #fff;
+            border: 1px solid rgba(148, 163, 184, 0.2);
+        }
+
+        .nav-links .btn-primary {
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            color: #fff;
+            border: none;
+        }
+
+        .main-content {
+            max-width: 1200px;
+            width: calc(100% - 32px);
+            margin: 24px auto 32px;
+            padding: 0;
+        }
+
+        .app-shell {
+            display: grid;
+            grid-template-columns: var(--sidebar-width) minmax(0, 1fr);
+            gap: 20px;
+            align-items: start;
+        }
+
+        .side-panel {
+            background: rgba(255,255,255,0.96);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            box-shadow: var(--shadow-soft);
+            padding: 18px 14px 14px;
+            position: sticky;
+            top: 90px;
+            min-height: 620px;
+        }
+
+        .side-panel .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 10px 18px;
+            color: var(--text);
+            letter-spacing: 0.08em;
+            font-weight: 800;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 12px;
+        }
+
+        .side-panel .nav-links-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .side-panel a {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 14px;
+            border-radius: 12px;
+            color: #475569;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        .side-panel a:hover,
+        .side-panel a.active {
+            background: linear-gradient(135deg, #e8f2ff 0%, #eef8f1 100%);
+            color: var(--text);
+        }
+
+        .side-panel .user-pill {
+            margin-top: auto;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 10px;
+            margin-top: 18px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: #f8fafc;
+        }
+
+        .side-panel .avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.8rem;
+        }
+
+        .side-panel .user-pill small {
+            display: block;
+            color: var(--muted);
+            line-height: 1.5;
+        }
+
+        .page-main {
+            min-width: 0;
+            width: 100%;
+            background: rgba(255,255,255,0.4);
+            border-radius: 20px;
+        }
+
+        @media (max-width: 900px) {
+            .app-shell {
+                grid-template-columns: 1fr;
+            }
+
+            .side-panel {
+                position: static;
+                min-height: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="navbar">
+        <div class="nav-container">
+            <a href="{{ url_for('home.home') }}" class="brand-logo">
+                <span class="shield-icon">🛡️</span>
+                <span class="brand-name">ExamGuard</span>
+                <span class="badge-gov">Official Monitoring Portal</span>
+            </a>
+
+            <nav class="nav-links">
+                <a href="{{ url_for('home.home') }}">Home</a>
+                {% if session.get('user_id') %}
+                    <a href="{{ url_for('dashboard.dashboard') }}">Dashboard</a>
+                    <a href="{{ url_for('auth.logout') }}" class="btn btn-outline">Logout</a>
+                {% else %}
+                    <a href="{{ url_for('auth.login') }}" class="btn btn-secondary">Login</a>
+                    <a href="{{ url_for('auth.register') }}" class="btn btn-primary">Register</a>
+                {% endif %}
+            </nav>
+        </div>
+    </header>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="flash-messages-container">
+          {% for category, message in messages %}
+            <div class="alert alert-{{ category }}">
+                <span>{{ message }}</span>
+                <button onclick="this.parentElement.remove()" class="close-btn">&times;</button>
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <main class="main-content">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="official-footer">
+        <div class="footer-container">
+            <div class="footer-info">
+                <h4>ExamGuard Integrity Platform</h4>
+                <p>National University Smart Examination & Proctored Assessment System</p>
+                <p class="tech-honest-tag">Engineered with Python, Flask, OpenCV & Base64 Stream Processors.</p>
+            </div>
+            <div class="footer-copy">
+                &copy; 2026 Academic B.Tech Final Year Project. All Rights Reserved.
+            </div>
+        </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

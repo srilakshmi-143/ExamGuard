@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Exam Completed - ExamGuard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="auth-container" style="text-align: center;">
+        <h2 style="color: var(--status-normal);">Exam Submitted Successfully</h2>
+        <p>Your responses and proctoring session logs have been saved.</p>
+        <div style="font-size: 1.5rem; margin: 20px 0;">
+            Score: <strong>{{ score }}</strong> / {{ total }}
+        </div>
+        <a href="/dashboard" class="btn" style="display: inline-block; text-decoration: none;">Return to Dashboard</a>
+    </div>
+</body>
+</html>
